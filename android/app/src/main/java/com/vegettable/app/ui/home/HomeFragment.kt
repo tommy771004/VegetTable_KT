@@ -267,6 +267,8 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
             adapter.setShowRetail(prefs.isShowRetailPrice)
             adapter.setFavorites(prefs.favorites)
         }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         currentCall?.cancel()

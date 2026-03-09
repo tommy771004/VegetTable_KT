@@ -157,6 +157,8 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
         prefs.toggleFavorite(product.cropCode)
         adapter.setFavorites(prefs.favorites)
         loadFavorites()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         currentCall?.cancel()
