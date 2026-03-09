@@ -115,12 +115,20 @@ class SearchFragment : Fragment(), ProductAdapter.OnItemClickListener {
                     tvResultCount.text = "找到 ${results.size} 項結果"
                     tvResultCount.visibility = View.VISIBLE
                     tvSearchError.visibility = View.GONE
+                } else {
+                    adapter.setItems(emptyList())
+                    tvResultCount.visibility = View.GONE
+                    tvSearchError.text = "搜尋失敗"
+                    tvSearchError.visibility = View.VISIBLE
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<List<ProductSummary>>>, t: Throwable) {
+                if (call.isCanceled) return
                 if (!isAdded) return
                 swipeRefresh.isRefreshing = false
+                adapter.setItems(emptyList())
+                tvResultCount.visibility = View.GONE
                 tvSearchError.text = "搜尋失敗: ${t.message}"
                 tvSearchError.visibility = View.VISIBLE
             }

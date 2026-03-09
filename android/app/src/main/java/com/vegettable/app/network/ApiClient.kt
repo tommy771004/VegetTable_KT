@@ -50,7 +50,9 @@ class ApiClient private constructor() {
                     if (response.isSuccessful) return@Interceptor response
                     // 4xx 不重試（用戶端錯誤，重試無意義）
                     if (response.code in 400..499) return@Interceptor response
-                    // 5xx 會重試，先關閉此次 response
+                    // 504 (Only-if-cached 失敗) 不重試，避免離線時無謂等待
+                    if (response.code == 504) return@Interceptor response
+                    // 其他 5xx 會重試，先關閉此次 response
                 } catch (e: IOException) {
                     lastException = e
                 }
@@ -80,6 +82,18 @@ class ApiClient private constructor() {
             chain.proceed(req)
         }
 
+        // 網路攔截器 — 強制寫入 Cache-Control 標頭，確保 OkHttp 會快取回應
+        val networkCacheInterceptor = Interceptor { chain ->
+            val response = chain.proceed(chain.request())
+            val cacheControl = CacheControl.Builder()
+                .maxAge(1, TimeUnit.HOURS) // 快取 1 小時
+                .build()
+            response.newBuilder()
+                .removeHeader("Pragma")
+                .header("Cache-Control", cacheControl.toString())
+                .build()
+        }
+
         val httpBuilder = OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -87,6 +101,7 @@ class ApiClient private constructor() {
             .addInterceptor(offlineFallbackInterceptor)
             .addInterceptor(retryInterceptor)
             .addInterceptor(logging)
+            .addNetworkInterceptor(networkCacheInterceptor)
 
         // OkHttp 磁碟快取 (10 MB)
         appContext?.let { context ->

@@ -53,19 +53,30 @@ class MainActivity : AppCompatActivity() {
             PermissionManager.requestNotificationPermission(this, notificationLauncher)
         }
 
-        homeFragment = HomeFragment()
-        searchFragment = SearchFragment()
-        favoritesFragment = FavoritesFragment()
-        settingsFragment = SettingsFragment()
+        if (savedInstanceState == null) {
+            homeFragment = HomeFragment()
+            searchFragment = SearchFragment()
+            favoritesFragment = FavoritesFragment()
+            settingsFragment = SettingsFragment()
 
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container, settingsFragment).hide(settingsFragment)
-            .add(R.id.fragment_container, favoritesFragment).hide(favoritesFragment)
-            .add(R.id.fragment_container, searchFragment).hide(searchFragment)
-            .add(R.id.fragment_container, homeFragment)
-            .commit()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container, settingsFragment, "settings").hide(settingsFragment)
+                .add(R.id.fragment_container, favoritesFragment, "favorites").hide(favoritesFragment)
+                .add(R.id.fragment_container, searchFragment, "search").hide(searchFragment)
+                .add(R.id.fragment_container, homeFragment, "home")
+                .commit()
 
-        activeFragment = homeFragment
+            activeFragment = homeFragment
+        } else {
+            homeFragment = supportFragmentManager.findFragmentByTag("home") as HomeFragment
+            searchFragment = supportFragmentManager.findFragmentByTag("search") as SearchFragment
+            favoritesFragment = supportFragmentManager.findFragmentByTag("favorites") as FavoritesFragment
+            settingsFragment = supportFragmentManager.findFragmentByTag("settings") as SettingsFragment
+            
+            // 找出當前顯示的 Fragment
+            activeFragment = listOf(homeFragment, searchFragment, favoritesFragment, settingsFragment)
+                .firstOrNull { !it.isHidden } ?: homeFragment
+        }
 
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setOnItemSelectedListener { item ->

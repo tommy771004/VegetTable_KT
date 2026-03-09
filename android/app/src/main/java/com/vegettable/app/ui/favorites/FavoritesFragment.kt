@@ -105,14 +105,14 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
                 if (all != null) {
                     val favProducts = all.filter { favCodes.contains(it.cropCode) }
                     if (favProducts.isNotEmpty()) {
-                        swipeRefresh.isRefreshing = false
                         adapter.setItems(favProducts)
                         rvFavorites.visibility = View.VISIBLE
                         tvEmpty.visibility = View.GONE
-                        return
+                        // 不 return，繼續往下執行 API 請求以獲取最新且完整的收藏清單
                     }
                 }
-            } catch (ignored: Exception) {
+            } catch (e: Exception) {
+                android.util.Log.e("FavoritesFragment", "Failed to parse cached products", e)
             }
         }
 
@@ -132,13 +132,21 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
                         adapter.setItems(favProducts)
                         rvFavorites.visibility = if (favProducts.isEmpty()) View.GONE else View.VISIBLE
                         tvEmpty.visibility = if (favProducts.isEmpty()) View.VISIBLE else View.GONE
+                    } else if (adapter.itemCount == 0) {
+                        // 如果 API 失敗且目前沒有顯示任何快取資料，則顯示空狀態
+                        tvEmpty.visibility = View.VISIBLE
+                        rvFavorites.visibility = View.GONE
                     }
                 }
 
                 override fun onFailure(call: Call<ApiResponse<List<ProductSummary>>>, t: Throwable) {
+                    if (call.isCanceled) return
                     if (!isAdded) return
                     swipeRefresh.isRefreshing = false
-                    tvEmpty.visibility = View.VISIBLE
+                    if (adapter.itemCount == 0) {
+                        tvEmpty.visibility = View.VISIBLE
+                        rvFavorites.visibility = View.GONE
+                    }
                 }
             })
     }

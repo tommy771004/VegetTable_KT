@@ -174,6 +174,7 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
                     call: Call<ApiResponse<PaginatedResponse<ProductSummary>>>,
                     t: Throwable
                 ) {
+                    if (call.isCanceled) return
                     if (!isAdded) return
                     swipeRefresh.isRefreshing = false
                     progressBar.visibility = View.GONE
@@ -225,8 +226,10 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
                     adapter.setItems(products)
                     rvProducts.visibility = View.VISIBLE
                     layoutError.visibility = View.GONE
+                    hasMore = false // 離線快取不支援分頁載入
                 }
-            } catch (ignored: Exception) {
+            } catch (e: Exception) {
+                android.util.Log.e("HomeFragment", "Failed to parse cached products", e)
             }
         }
     }
