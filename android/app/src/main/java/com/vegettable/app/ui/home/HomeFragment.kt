@@ -45,6 +45,7 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
     private var currentOffset = 0
     private var hasMore = false
     private var isLoadingMore = false
+    private var currentCall: Call<ApiResponse<PaginatedResponse<ProductSummary>>>? = null
 
     companion object {
         private const val PAGE_SIZE = 20
@@ -136,12 +137,14 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     private fun loadProducts() {
+        currentCall?.cancel()
+        
         progressBar.visibility = View.VISIBLE
         layoutError.visibility = View.GONE
         currentOffset = 0
 
-        ApiClient.getInstance().api.getProductsPaginated(selectedCategory, 0, PAGE_SIZE)
-            .enqueue(object : Callback<ApiResponse<PaginatedResponse<ProductSummary>>> {
+        currentCall = ApiClient.getInstance().api.getProductsPaginated(selectedCategory, 0, PAGE_SIZE)
+        currentCall?.enqueue(object : Callback<ApiResponse<PaginatedResponse<ProductSummary>>> {
                 override fun onResponse(
                     call: Call<ApiResponse<PaginatedResponse<ProductSummary>>>,
                     response: Response<ApiResponse<PaginatedResponse<ProductSummary>>>
@@ -184,8 +187,8 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
         if (!hasMore || isLoadingMore) return
         isLoadingMore = true
 
-        ApiClient.getInstance().api.getProductsPaginated(selectedCategory, currentOffset, PAGE_SIZE)
-            .enqueue(object : Callback<ApiResponse<PaginatedResponse<ProductSummary>>> {
+        currentCall = ApiClient.getInstance().api.getProductsPaginated(selectedCategory, currentOffset, PAGE_SIZE)
+        currentCall?.enqueue(object : Callback<ApiResponse<PaginatedResponse<ProductSummary>>> {
                 override fun onResponse(
                     call: Call<ApiResponse<PaginatedResponse<ProductSummary>>>,
                     response: Response<ApiResponse<PaginatedResponse<ProductSummary>>>
@@ -234,11 +237,13 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(product: ProductSummary) {
-        val intent = Intent(requireContext(), DetailActivity::class.java).apply {
-            putExtra("cropName", product.cropName)
-            putExtra("cropCode", product.cropCode)
-        }
-        startActivity(intent)
+        // 暫時註解掉跳轉，避免進入尚未實作的空白畫面
+        // val intent = Intent(requireContext(), DetailActivity::class.java).apply {
+        //     putExtra("cropName", product.cropName)
+        //     putExtra("cropCode", product.cropCode)
+        // }
+        // startActivity(intent)
+        android.widget.Toast.makeText(requireContext(), "商品詳情功能開發中", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     override fun onFavoriteClick(product: ProductSummary) {
@@ -253,5 +258,17 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
         adapter.setPriceUnit(prefs.priceUnit)
         adapter.setShowRetail(prefs.isShowRetailPrice)
         adapter.setFavorites(prefs.favorites)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            adapter.setPriceUnit(prefs.priceUnit)
+            adapter.setShowRetail(prefs.isShowRetailPrice)
+            adapter.setFavorites(prefs.favorites)
+        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        currentCall?.cancel()
     }
 }

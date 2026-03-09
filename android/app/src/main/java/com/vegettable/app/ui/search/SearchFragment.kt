@@ -87,14 +87,15 @@ class SearchFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     private fun performSearch(keyword: String) {
+        // 取消前一次尚未完成的搜尋請求
+        currentSearchCall?.cancel()
+        currentSearchCall = null
+
         if (keyword.isEmpty()) {
             adapter.setItems(emptyList())
             tvResultCount.visibility = View.GONE
             return
         }
-
-        // 取消前一次尚未完成的搜尋請求
-        currentSearchCall?.cancel()
 
         tvSearchError.visibility = View.GONE
 
@@ -127,11 +128,13 @@ class SearchFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(product: ProductSummary) {
-        val intent = Intent(requireContext(), DetailActivity::class.java).apply {
-            putExtra("cropName", product.cropName)
-            putExtra("cropCode", product.cropCode)
-        }
-        startActivity(intent)
+        // 暫時註解掉跳轉，避免進入尚未實作的空白畫面
+        // val intent = Intent(requireContext(), DetailActivity::class.java).apply {
+        //     putExtra("cropName", product.cropName)
+        //     putExtra("cropCode", product.cropCode)
+        // }
+        // startActivity(intent)
+        android.widget.Toast.makeText(requireContext(), "商品詳情功能開發中", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     override fun onFavoriteClick(product: ProductSummary) {
@@ -144,6 +147,15 @@ class SearchFragment : Fragment(), ProductAdapter.OnItemClickListener {
         adapter.setPriceUnit(prefs.priceUnit)
         adapter.setShowRetail(prefs.isShowRetailPrice)
         adapter.setFavorites(prefs.favorites)
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            adapter.setPriceUnit(prefs.priceUnit)
+            adapter.setShowRetail(prefs.isShowRetailPrice)
+            adapter.setFavorites(prefs.favorites)
+        }
     }
 
     override fun onDestroyView() {

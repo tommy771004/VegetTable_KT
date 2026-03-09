@@ -31,6 +31,7 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var adapter: ProductAdapter
     private lateinit var prefs: PrefsManager
+    private var currentCall: Call<ApiResponse<List<ProductSummary>>>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,7 +70,19 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
         loadFavorites()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            adapter.setPriceUnit(prefs.priceUnit)
+            adapter.setShowRetail(prefs.isShowRetailPrice)
+            adapter.setFavorites(prefs.favorites)
+            loadFavorites()
+        }
+    }
+
     private fun loadFavorites() {
+        currentCall?.cancel()
+        
         val favCodes = prefs.favorites
 
         if (favCodes.isEmpty()) {
@@ -104,8 +117,8 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
         }
 
         // 若快取為空，從 API 載入全部產品再過濾
-        ApiClient.getInstance().api.getProducts(null)
-            .enqueue(object : Callback<ApiResponse<List<ProductSummary>>> {
+        currentCall = ApiClient.getInstance().api.getProducts(null)
+        currentCall?.enqueue(object : Callback<ApiResponse<List<ProductSummary>>> {
                 override fun onResponse(
                     call: Call<ApiResponse<List<ProductSummary>>>,
                     response: Response<ApiResponse<List<ProductSummary>>>
@@ -131,16 +144,21 @@ class FavoritesFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(product: ProductSummary) {
-        val intent = Intent(requireContext(), DetailActivity::class.java).apply {
-            putExtra("cropName", product.cropName)
-            putExtra("cropCode", product.cropCode)
-        }
-        startActivity(intent)
+        // 暫時註解掉跳轉，避免進入尚未實作的空白畫面
+        // val intent = Intent(requireContext(), DetailActivity::class.java).apply {
+        //     putExtra("cropName", product.cropName)
+        //     putExtra("cropCode", product.cropCode)
+        // }
+        // startActivity(intent)
+        android.widget.Toast.makeText(requireContext(), "商品詳情功能開發中", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     override fun onFavoriteClick(product: ProductSummary) {
         prefs.toggleFavorite(product.cropCode)
         adapter.setFavorites(prefs.favorites)
         loadFavorites()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        currentCall?.cancel()
     }
 }
