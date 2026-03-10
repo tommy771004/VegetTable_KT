@@ -1,5 +1,5 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Vegettable",
+  "description": "A produce price tracking and prediction application with an Android client and .NET Core API.",
   "requestFramePermissions": []
 }

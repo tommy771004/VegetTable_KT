@@ -240,13 +240,11 @@ class HomeFragment : Fragment(), ProductAdapter.OnItemClickListener {
     }
 
     override fun onItemClick(product: ProductSummary) {
-        // 暫時註解掉跳轉，避免進入尚未實作的空白畫面
-        // val intent = Intent(requireContext(), DetailActivity::class.java).apply {
-        //     putExtra("cropName", product.cropName)
-        //     putExtra("cropCode", product.cropCode)
-        // }
-        // startActivity(intent)
-        android.widget.Toast.makeText(requireContext(), "商品詳情功能開發中", android.widget.Toast.LENGTH_SHORT).show()
+        val intent = Intent(requireContext(), DetailActivity::class.java).apply {
+            putExtra("cropName", product.cropName)
+            putExtra("cropCode", product.cropCode)
+        }
+        startActivity(intent)
     }
 
     override fun onFavoriteClick(product: ProductSummary) {

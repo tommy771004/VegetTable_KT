@@ -53,18 +53,15 @@ class SettingsFragment : Fragment() {
 
         // ─── 快捷功能 ─────────────────────────────────────────
         view.findViewById<View>(R.id.btn_seasonal).setOnClickListener {
-            // startActivity(Intent(requireContext(), SeasonalActivity::class.java))
-            android.widget.Toast.makeText(requireContext(), "當季推薦功能開發中", android.widget.Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireContext(), SeasonalActivity::class.java))
         }
 
         view.findViewById<View>(R.id.btn_compare).setOnClickListener {
-            // startActivity(Intent(requireContext(), CompareActivity::class.java))
-            android.widget.Toast.makeText(requireContext(), "比價功能開發中", android.widget.Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireContext(), CompareActivity::class.java))
         }
 
         view.findViewById<View>(R.id.btn_map).setOnClickListener {
-            // startActivity(Intent(requireContext(), MapActivity::class.java))
-            android.widget.Toast.makeText(requireContext(), "市場地圖功能開發中", android.widget.Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireContext(), MapActivity::class.java))
         }
     }
 }
