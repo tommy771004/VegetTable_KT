@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VegetTable</string>
+    <string name="app_widget_description">顯示今日最新菜價</string>
+    <string name="appwidget_text">今日菜價</string>
+</resources>
