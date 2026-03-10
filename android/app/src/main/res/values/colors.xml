@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#81C784</color>
+    <color name="colorPrimaryDark">#388E3C</color>
+    <color name="colorAccent">#4CAF50</color>
+    
+    <!-- Light green background -->
+    <color name="bg_light_green">#E8F5E9</color>
+    <color name="bg_light_green_darker">#C8E6C9</color>
+    
+    <!-- Liquid Glass Colors -->
+    <color name="glass_background">#B3FFFFFF</color> <!-- 70% white -->
+    <color name="glass_background_darker">#80FFFFFF</color> <!-- 50% white -->
+    <color name="glass_stroke">#99FFFFFF</color> <!-- 60% white -->
+    <color name="glass_stroke_light">#E6FFFFFF</color> <!-- 90% white -->
+    
+    <color name="text_primary">#1B5E20</color>
+    <color name="text_secondary">#388E3C</color>
+</resources>
